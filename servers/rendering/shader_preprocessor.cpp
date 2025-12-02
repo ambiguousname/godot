@@ -403,6 +403,8 @@ void ShaderPreprocessor::process_directive(Tokenizer *p_tokenizer) {
 		process_include(p_tokenizer);
 	} else if (directive == "pragma") {
 		process_pragma(p_tokenizer);
+	} else if (directive == "pass") {
+		process_pass(p_tokenizer);
 	} else {
 		set_error(RTR("Unknown directive."), p_tokenizer->get_line());
 	}
@@ -1462,6 +1464,7 @@ void ShaderPreprocessor::get_keyword_list(List<String> *r_keywords, bool p_inclu
 	r_keywords->push_back("include");
 	r_keywords->push_back("pragma");
 	r_keywords->push_back("undef");
+	r_keywords->push_back("pass");
 }
 
 void ShaderPreprocessor::get_pragma_list(List<String> *r_pragmas) {
