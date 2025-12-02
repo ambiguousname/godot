@@ -837,10 +837,12 @@ void ShaderPreprocessor::process_pass(Tokenizer *p_tokenizer) {
 		return;
 	}
 
-	if (state->defines.has(label)) {
+	// TODO: Add this to Macro redefinition errors as well?
+	if (state->defines.has(label) || state->passes.has(label)) {
 		set_error(vformat(RTR("Cannot use pass directive '%s' if it's been already defined previously."), label), line);
 		return;
 	}
+	state->passes.push_back(label);
 }
 
 void ShaderPreprocessor::add_region(int p_line, bool p_enabled, Region *p_parent_region) {
