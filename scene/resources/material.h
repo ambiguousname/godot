@@ -96,6 +96,8 @@ public:
 class ShaderMaterial : public Material {
 	GDCLASS(ShaderMaterial, Material);
 	Ref<Shader> shader;
+	Ref<Shader> shader_processed_pass;
+	String shader_pass;
 
 	mutable HashMap<StringName, StringName> remap_cache;
 	mutable HashMap<StringName, Variant> param_cache;
@@ -126,6 +128,9 @@ public:
 
 	void set_shader_parameter(const StringName &p_param, const Variant &p_value);
 	Variant get_shader_parameter(const StringName &p_param) const;
+
+	void set_shader_pass(const String& p_pass);
+	String get_shader_pass() const;
 
 	virtual Shader::Mode get_shader_mode() const override;
 

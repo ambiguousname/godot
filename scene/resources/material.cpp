@@ -445,6 +445,53 @@ Ref<Shader> ShaderMaterial::get_shader() const {
 	return shader;
 }
 
+// FIXME: Remove at some point. This is just to test if this concept is workable.
+#include <servers/rendering/shader_preprocessor.h>
+void ShaderMaterial::set_shader_pass(const String& p_pass) {
+	// TODO: Holder for multiple Shader passes, instead of unique to each material?
+	// TODO: When the original shader changes, this should update.
+	// TODO: When set_shader is called, free and re-process shader_processed_pass.
+	shader_pass = p_pass;
+	if (shader_processed_pass.is_valid()) {
+		shader_processed_pass.unref();
+	}
+	shader_processed_pass = memnew(Shader);
+
+	if (p_pass.is_empty()) {
+		return;
+	}
+
+	String path = shader->get_path();
+	// FIXME: Probably very hacky, especially for if new #includes are introduced.
+	// I think adding a set_code_preprocessed could be the way to go? 
+	ShaderPreprocessor preprocessor;
+
+	String code = shader->get_code();
+	String preprocessed_code = code;
+	preprocessor.preprocess(code, path, preprocessed_code, &p_pass);
+	// TODO: Error printing for pass processing.
+	
+	// TODO: 
+	// Will need to clarify on implementation details, maybe we ignore #pass entirely and use
+	// #variant PASS_NAME DEFINE_1 DEFINE_2 ... DEFINE_N
+	// So then that avoids modifying more code.
+	shader_processed_pass->set_code(preprocessed_code);
+
+	RID rid;
+	if (shader_processed_pass.is_valid()) {
+		rid = shader_processed_pass->get_rid();
+	}
+
+	RID material_rid = _get_material();
+	if (material_rid.is_valid()) {
+		RS::get_singleton()->material_set_shader(material_rid, rid);
+	}
+}
+
+String ShaderMaterial::get_shader_pass() const {
+	return shader_pass;
+}
+
 void ShaderMaterial::set_shader_parameter(const StringName &p_param, const Variant &p_value) {
 	RID material_rid = _get_material();
 	if (p_value.get_type() == Variant::NIL) {
@@ -520,10 +567,13 @@ void ShaderMaterial::_check_material_rid() const {
 void ShaderMaterial::_bind_methods() {
 	ClassDB::bind_method(D_METHOD("set_shader", "shader"), &ShaderMaterial::set_shader);
 	ClassDB::bind_method(D_METHOD("get_shader"), &ShaderMaterial::get_shader);
+	ClassDB::bind_method(D_METHOD("set_shader_pass", "shader_pass"), &ShaderMaterial::set_shader_pass);
+	ClassDB::bind_method(D_METHOD("get_shader_pass"), &ShaderMaterial::get_shader_pass);
 	ClassDB::bind_method(D_METHOD("set_shader_parameter", "param", "value"), &ShaderMaterial::set_shader_parameter);
 	ClassDB::bind_method(D_METHOD("get_shader_parameter", "param"), &ShaderMaterial::get_shader_parameter);
 
 	ADD_PROPERTY(PropertyInfo(Variant::OBJECT, "shader", PROPERTY_HINT_RESOURCE_TYPE, "Shader"), "set_shader", "get_shader");
+	ADD_PROPERTY(PropertyInfo(Variant::STRING, "shader_pass", PROPERTY_HINT_NONE, "Shader Pass"), "set_shader_pass", "get_shader_pass");
 }
 
 #ifdef TOOLS_ENABLED

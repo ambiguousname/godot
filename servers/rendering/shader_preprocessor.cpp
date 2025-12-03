@@ -838,7 +838,9 @@ void ShaderPreprocessor::process_pass(Tokenizer *p_tokenizer) {
 	}
 
 	// TODO: Add this to Macro redefinition errors as well?
-	if (state->defines.has(label) || state->passes.has(label)) {
+	// We can't tell during multi-pass shader evaluation if something has been defined as part of that process, or
+	// a shader-specified #define, so we only check previous passes:
+	if (state->passes.has(label)) {
 		set_error(vformat(RTR("Cannot use pass directive '%s' if it's been already defined previously."), label), line);
 		return;
 	}
@@ -1350,7 +1352,7 @@ Error ShaderPreprocessor::preprocess(State *p_state, const String &p_code, Strin
 	return OK;
 }
 
-Error ShaderPreprocessor::preprocess(const String &p_code, const String &p_filename, String &r_result, String *p_pass, String *r_error_text, List<FilePosition> *r_error_position, List<Region> *r_regions, HashSet<Ref<ShaderInclude>> *r_includes, List<ScriptLanguage::CodeCompletionOption> *r_completion_options, List<ScriptLanguage::CodeCompletionOption> *r_completion_defines, IncludeCompletionFunction p_include_completion_func, Vector<String> *r_passes) {
+Error ShaderPreprocessor::preprocess(const String &p_code, const String &p_filename, String &r_result, const String *p_pass, String *r_error_text, List<FilePosition> *r_error_position, List<Region> *r_regions, HashSet<Ref<ShaderInclude>> *r_includes, List<ScriptLanguage::CodeCompletionOption> *r_completion_options, List<ScriptLanguage::CodeCompletionOption> *r_completion_defines, IncludeCompletionFunction p_include_completion_func, Vector<String> *r_passes) {
 	State pp_state;
 	if (!p_filename.is_empty()) {
 		pp_state.current_filename = p_filename;
