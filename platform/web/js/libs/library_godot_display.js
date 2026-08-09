@@ -238,6 +238,8 @@ const GodotDisplayScreen = {
 			return GodotDisplayScreen.hidpi ? window.devicePixelRatio || 1 : 1;
 		},
 		isFullscreen: function () {
+			// FIXME:
+			return false;
 			const elem = document.fullscreenElement || document.mozFullscreenElement
 				|| document.webkitFullscreenElement || document.msFullscreenElement;
 			if (elem) {
@@ -248,6 +250,8 @@ const GodotDisplayScreen = {
 				|| document.webkitIsFullscreen;
 		},
 		hasFullscreen: function () {
+			// FIXME:
+			return false;
 			return document.fullscreenEnabled || document.mozFullScreenEnabled
 				|| document.webkitFullscreenEnabled;
 		},
@@ -462,6 +466,9 @@ const GodotDisplay = {
 	godot_js_display_alert__proxy: 'sync',
 	godot_js_display_alert__sig: 'vi',
 	godot_js_display_alert: function (p_text) {
+		// FIXME:
+		console.error(GodotRuntime.parseString(p_text));
+		return;
 		window.alert(GodotRuntime.parseString(p_text)); // eslint-disable-line no-alert
 	},
 
@@ -524,6 +531,8 @@ const GodotDisplay = {
 	godot_js_display_has_webgl__proxy: 'sync',
 	godot_js_display_has_webgl__sig: 'ii',
 	godot_js_display_has_webgl: function (p_version) {
+		// FIXME:
+		return true;
 		if (p_version !== 1 && p_version !== 2) {
 			return false;
 		}
@@ -545,6 +554,8 @@ const GodotDisplay = {
 	godot_js_display_canvas_is_focused__proxy: 'sync',
 	godot_js_display_canvas_is_focused__sig: 'i',
 	godot_js_display_canvas_is_focused: function () {
+		// FIXME:
+		return false;
 		return document.activeElement === GodotConfig.canvas;
 	},
 
@@ -597,12 +608,16 @@ const GodotDisplay = {
 	godot_js_display_window_title_set__proxy: 'sync',
 	godot_js_display_window_title_set__sig: 'vi',
 	godot_js_display_window_title_set: function (p_data) {
+		// FIXME:
+		return;
 		document.title = GodotRuntime.parseString(p_data);
 	},
 
 	godot_js_display_window_icon_set__proxy: 'sync',
 	godot_js_display_window_icon_set__sig: 'vii',
 	godot_js_display_window_icon_set: function (p_ptr, p_len) {
+		// FIXME:
+		return;
 		let link = document.getElementById('-gd-engine-icon');
 		const old_icon = GodotDisplay.window_icon;
 		if (p_ptr) {
@@ -702,6 +717,8 @@ const GodotDisplay = {
 	godot_js_display_fullscreen_cb__proxy: 'sync',
 	godot_js_display_fullscreen_cb__sig: 'vi',
 	godot_js_display_fullscreen_cb: function (callback) {
+		// FIXME:
+		return;
 		const canvas = GodotConfig.canvas;
 		const func = GodotRuntime.get_func(callback);
 		function change_cb(evt) {
@@ -744,7 +761,9 @@ const GodotDisplay = {
 			ev.preventDefault();
 		}, false);
 		GodotEventListeners.add(canvas, 'webglcontextlost', function (ev) {
-			alert('WebGL context lost, please reload the page'); // eslint-disable-line no-alert
+			// FIXME:
+			console.error("WebGL context lost, please reload the page");
+			// alert('WebGL context lost, please reload the page'); // eslint-disable-line no-alert
 			ev.preventDefault();
 		}, false);
 		GodotDisplayScreen.hidpi = !!p_hidpi;
