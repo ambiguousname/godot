@@ -1141,7 +1141,7 @@ DisplayServerWeb::DisplayServerWeb(const String &p_rendering_driver, DisplayServ
 		attributes.majorVersion = 2;
 		attributes.explicitSwapControl = true;
 
-		webgl_ctx = emscripten_webgl_create_context(canvas_id, &attributes);
+		webgl_ctx = godot_js_display_create_offscreen_canvas_context(canvas_id, &attributes);
 		webgl2_inited = webgl_ctx && emscripten_webgl_make_context_current(webgl_ctx) == EMSCRIPTEN_RESULT_SUCCESS;
 	}
 	if (webgl2_inited) {

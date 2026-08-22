@@ -541,6 +541,18 @@ const GodotDisplay = {
 		} catch (e) { /* Not available */ }
 		return false;
 	},
+	godot_js_display_create_offscreen_canvas_context: function(target, attributes) {
+		// From https://github.com/emscripten-core/emscripten/blob/a04d0beef36bfa7661cee4b8dff7d3909303dabc/src/lib/libhtml5_webgl.js#L70
+		var attr32=attributes>>2;
+		var powerPreference=HEAP32[attr32+(8>>2)];
+
+		var contextAttributes={alpha:!!HEAP8[attributes+0],depth:!!HEAP8[attributes+1],stencil:!!HEAP8[attributes+2],antialias:!!HEAP8[attributes+3],premultipliedAlpha:!!HEAP8[attributes+4],preserveDrawingBuffer:!!HEAP8[attributes+5],powerPreference:"default",failIfMajorPerformanceCaveat:!!HEAP8[attributes+12],majorVersion:HEAP32[attr32+(16>>2)],minorVersion:HEAP32[attr32+(20>>2)],enableExtensionsByDefault:HEAP8[attributes+24],explicitSwapControl:HEAP8[attributes+25],proxyContextToMainThread:HEAP32[attr32+(28>>2)],renderViaOffscreenBackBuffer:HEAP8[attributes+32]};
+
+		if(contextAttributes.explicitSwapControl&&!contextAttributes.renderViaOffscreenBackBuffer){contextAttributes.renderViaOffscreenBackBuffer=true}
+		var contextHandle=GL.createContext(GodotConfig.canvas,contextAttributes);
+
+		return contextHandle;
+	},
 
 	/*
 	 * Canvas
