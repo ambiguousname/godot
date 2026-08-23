@@ -223,7 +223,7 @@ const GodotDisplayCursor = {
 			}
 		},
 		isPointerLocked: function () {
-			return document.pointerLockElement === GodotConfig.canvas;
+			return typeof document !== "undefined" && document.pointerLockElement === GodotConfig.canvas;
 		},
 	},
 };
