@@ -68,6 +68,7 @@ const GodotConfig = {
 		init_config: function (p_opts) {
 			GodotConfig.canvas_resize_policy = p_opts['canvasResizePolicy'];
 			GodotConfig.canvas = p_opts['canvas'];
+			GodotConfig.hasWebGL = p_opts['hasWebGL'];
 			GodotConfig.locale = p_opts['locale'] || GodotConfig.locale;
 			GodotConfig.virtual_keyboard = p_opts['virtualKeyboard'];
 			GodotConfig.persistent_drops = !!p_opts['persistentDrops'];

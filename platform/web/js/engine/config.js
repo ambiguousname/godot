@@ -33,9 +33,16 @@ const InternalConfig = function (initConfig) { // eslint-disable-line no-unused-
 		 *
 		 * @memberof EngineConfig
 		 * @default
-		 * @type {?HTMLCanvasElement}
+		 * @type {?(HTMLCanvasElement | OffscreenCanvas)}
 		 */
 		canvas: null,
+		/**
+		 * User provided method for checking WebGL version. Used for OffscreenCanvas based rendering (where we can't easily check the DOM)
+		 * @memberof EngineConfig
+		 * @default
+		 * @type {(number) => boolean}
+		 */
+		hasWebGL: null,
 		/**
 		 * The name of the WASM file without the extension. (Set by Godot Editor export process).
 		 *
@@ -258,6 +265,7 @@ const InternalConfig = function (initConfig) { // eslint-disable-line no-unused-
 
 		// Godot config
 		this.canvas = parse('canvas', this.canvas);
+		this.hasWebGL = parse('hasWebGL', this.hasWebGL);
 		this.executable = parse('executable', this.executable);
 		this.mainPack = parse('mainPack', this.mainPack);
 		this.locale = parse('locale', this.locale);
@@ -359,6 +367,7 @@ const InternalConfig = function (initConfig) { // eslint-disable-line no-unused-
 		// Godot configuration.
 		return {
 			'canvas': this.canvas,
+			'hasWebGL': this.hasWebGL,
 			'canvasResizePolicy': this.canvasResizePolicy,
 			'locale': locale,
 			'persistentDrops': this.persistentDrops,

@@ -238,8 +238,9 @@ const GodotDisplayScreen = {
 			return GodotDisplayScreen.hidpi ? window.devicePixelRatio || 1 : 1;
 		},
 		isFullscreen: function () {
-			// FIXME:
-			return false;
+			if (typeof document === "undefined") {
+				return false;
+			}
 			const elem = document.fullscreenElement || document.mozFullscreenElement
 				|| document.webkitFullscreenElement || document.msFullscreenElement;
 			if (elem) {
@@ -250,8 +251,9 @@ const GodotDisplayScreen = {
 				|| document.webkitIsFullscreen;
 		},
 		hasFullscreen: function () {
-			// FIXME:
-			return false;
+			if (typeof document === "undefined") {
+				return false;
+			}
 			return document.fullscreenEnabled || document.mozFullScreenEnabled
 				|| document.webkitFullscreenEnabled;
 		},
@@ -466,9 +468,7 @@ const GodotDisplay = {
 	godot_js_display_alert__proxy: 'sync',
 	godot_js_display_alert__sig: 'vi',
 	godot_js_display_alert: function (p_text) {
-		// FIXME:
 		console.error(GodotRuntime.parseString(p_text));
-		return;
 		window.alert(GodotRuntime.parseString(p_text)); // eslint-disable-line no-alert
 	},
 
@@ -531,13 +531,16 @@ const GodotDisplay = {
 	godot_js_display_has_webgl__proxy: 'sync',
 	godot_js_display_has_webgl__sig: 'ii',
 	godot_js_display_has_webgl: function (p_version) {
-		// FIXME:
-		return true;
 		if (p_version !== 1 && p_version !== 2) {
 			return false;
 		}
 		try {
-			return !!document.createElement('canvas').getContext(p_version === 2 ? 'webgl2' : 'webgl');
+			if (typeof document === "undefined") {
+				// If we're rendering to an OffscreenCanvas, then the user can implement checking for support for us.
+				return GodotConfig.hasWebGL(p_version);
+			} else {
+				return !!document.createElement('canvas').getContext(p_version === 2 ? 'webgl2' : 'webgl');
+			}
 		} catch (e) { /* Not available */ }
 		return false;
 	},
