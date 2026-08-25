@@ -124,6 +124,9 @@ const GodotIME = {
 				}
 			}
 
+			if (typeof document === "undefined") {
+				return;
+			}
 			const ime = document.createElement('div');
 			ime.className = 'ime';
 			ime.style.background = 'none';
@@ -245,16 +248,19 @@ const GodotInputGamepads = {
 					add(pads[i]);
 				}
 			}
-			// GodotEventListeners.add(window, 'gamepadconnected', function (evt) {
-			// 	if (evt.gamepad) {
-			// 		add(evt.gamepad);
-			// 	}
-			// }, false);
-			// GodotEventListeners.add(window, 'gamepaddisconnected', function (evt) {
-			// 	if (evt.gamepad) {
-			// 		onchange(evt.gamepad.index, 0);
-			// 	}
-			// }, false);
+			if (typeof document === "undefined") {
+				return;
+			}
+			GodotEventListeners.add(window, 'gamepadconnected', function (evt) {
+				if (evt.gamepad) {
+					add(evt.gamepad);
+				}
+			}, false);
+			GodotEventListeners.add(window, 'gamepaddisconnected', function (evt) {
+				if (evt.gamepad) {
+					onchange(evt.gamepad.index, 0);
+				}
+			}, false);
 		},
 
 		get_guid: function (pad) {
@@ -519,6 +525,9 @@ const GodotInput = {
 	godot_js_input_mouse_move_cb__proxy: 'sync',
 	godot_js_input_mouse_move_cb__sig: 'vi',
 	godot_js_input_mouse_move_cb: function (callback) {
+		if (GodotConfig.canvas instanceof OffscreenCanvas) {
+			return;
+		}
 		const func = GodotRuntime.get_func(callback);
 		const canvas = GodotConfig.canvas;
 		function move_cb(evt) {
@@ -532,24 +541,36 @@ const GodotInput = {
 			const modifiers = GodotInput.getModifiers(evt);
 			func(pos[0], pos[1], rel_pos_x, rel_pos_y, modifiers, evt.pressure);
 		}
-		// GodotEventListeners.add(window, 'pointermove', move_cb, false);
+		if (typeof document === "undefined") {
+			return;
+		}
+		GodotEventListeners.add(window, 'pointermove', move_cb, false);
 	},
 
 	godot_js_input_mouse_wheel_cb__proxy: 'sync',
 	godot_js_input_mouse_wheel_cb__sig: 'vi',
 	godot_js_input_mouse_wheel_cb: function (callback) {
+		if (GodotConfig.canvas instanceof OffscreenCanvas) {
+			return;
+		}
 		const func = GodotRuntime.get_func(callback);
 		function wheel_cb(evt) {
 			if (func(evt.deltaMode, evt.deltaX ?? 0, evt.deltaY ?? 0)) {
 				evt.preventDefault();
 			}
 		}
-		// GodotEventListeners.add(GodotConfig.canvas, 'wheel', wheel_cb, false);
+		if (typeof document === "undefined") {
+			return;
+		}
+		GodotEventListeners.add(GodotConfig.canvas, 'wheel', wheel_cb, false);
 	},
 
 	godot_js_input_mouse_button_cb__proxy: 'sync',
 	godot_js_input_mouse_button_cb__sig: 'vi',
 	godot_js_input_mouse_button_cb: function (callback) {
+		if (GodotConfig.canvas instanceof OffscreenCanvas) {
+			return;
+		}
 		const func = GodotRuntime.get_func(callback);
 		const canvas = GodotConfig.canvas;
 		function button_cb(p_pressed, evt) {
@@ -565,8 +586,11 @@ const GodotInput = {
 				evt.preventDefault();
 			}
 		}
-		// GodotEventListeners.add(canvas, 'mousedown', button_cb.bind(null, 1), false);
-		// GodotEventListeners.add(window, 'mouseup', button_cb.bind(null, 0), false);
+		if (typeof document === "undefined") {
+			return;
+		}
+		GodotEventListeners.add(canvas, 'mousedown', button_cb.bind(null, 1), false);
+		GodotEventListeners.add(window, 'mouseup', button_cb.bind(null, 0), false);
 	},
 
 	/*
@@ -577,6 +601,9 @@ const GodotInput = {
 	godot_js_input_touch_cb: function (callback, ids, coords) {
 		const func = GodotRuntime.get_func(callback);
 		const canvas = GodotConfig.canvas;
+		if (canvas instanceof OffscreenCanvas) {
+			return;
+		}
 		function touch_cb(type, evt) {
 			// Since the event is consumed, focus manually.
 			// NOTE: The iframe container may not have focus yet, so focus even when already active.
@@ -597,10 +624,13 @@ const GodotInput = {
 				evt.preventDefault();
 			}
 		}
-		// GodotEventListeners.add(canvas, 'touchstart', touch_cb.bind(null, 0), false);
-		// GodotEventListeners.add(canvas, 'touchend', touch_cb.bind(null, 1), false);
-		// GodotEventListeners.add(canvas, 'touchcancel', touch_cb.bind(null, 1), false);
-		// GodotEventListeners.add(canvas, 'touchmove', touch_cb.bind(null, 2), false);
+		if (typeof document === "undefined") {
+			return;
+		}
+		GodotEventListeners.add(canvas, 'touchstart', touch_cb.bind(null, 0), false);
+		GodotEventListeners.add(canvas, 'touchend', touch_cb.bind(null, 1), false);
+		GodotEventListeners.add(canvas, 'touchcancel', touch_cb.bind(null, 1), false);
+		GodotEventListeners.add(canvas, 'touchmove', touch_cb.bind(null, 2), false);
 	},
 
 	/*
@@ -609,13 +639,19 @@ const GodotInput = {
 	godot_js_input_key_cb__proxy: 'sync',
 	godot_js_input_key_cb__sig: 'viii',
 	godot_js_input_key_cb: function (pCallback, pCodePtr, pKeyPtr) {
+		if (GodotConfig.canvas instanceof OffscreenCanvas) {
+			return;
+		}
 		GodotInput.inputKeyCallback = GodotRuntime.get_func(pCallback);
 		GodotInput.setInputKeyData = (pCode, pKey) => {
 			GodotRuntime.stringToHeap(pCode, pCodePtr, 32);
 			GodotRuntime.stringToHeap(pKey, pKeyPtr, 32);
 		};
-		// GodotEventListeners.add(GodotConfig.canvas, 'keydown', GodotInput.onKeyEvent.bind(null, true), false);
-		// GodotEventListeners.add(GodotConfig.canvas, 'keyup', GodotInput.onKeyEvent.bind(null, false), false);
+		if (typeof document === "undefined") {
+			return;
+		}
+		GodotEventListeners.add(GodotConfig.canvas, 'keydown', GodotInput.onKeyEvent.bind(null, true), false);
+		GodotEventListeners.add(GodotConfig.canvas, 'keyup', GodotInput.onKeyEvent.bind(null, false), false);
 	},
 
 	/*
@@ -624,21 +660,18 @@ const GodotInput = {
 	godot_js_set_ime_active__proxy: 'sync',
 	godot_js_set_ime_active__sig: 'vi',
 	godot_js_set_ime_active: function (p_active) {
-		return;
 		GodotIME.ime_active(p_active);
 	},
 
 	godot_js_set_ime_position__proxy: 'sync',
 	godot_js_set_ime_position__sig: 'vii',
 	godot_js_set_ime_position: function (p_x, p_y) {
-		return;
 		GodotIME.ime_position(p_x, p_y);
 	},
 
 	godot_js_set_ime_cb__proxy: 'sync',
 	godot_js_set_ime_cb__sig: 'viiii',
 	godot_js_set_ime_cb: function (p_ime_cb, p_key_cb, code, key) {
-		return;
 		const ime_cb = GodotRuntime.get_func(p_ime_cb);
 		const key_cb = GodotRuntime.get_func(p_key_cb);
 		GodotIME.init(ime_cb, key_cb, code, key);
@@ -647,7 +680,6 @@ const GodotInput = {
 	godot_js_is_ime_focused__proxy: 'sync',
 	godot_js_is_ime_focused__sig: 'i',
 	godot_js_is_ime_focused: function () {
-		return false;
 		return GodotIME.active;
 	},
 
@@ -716,11 +748,14 @@ const GodotInput = {
 			GodotRuntime.freeStringArray(argv, argc);
 		};
 		const canvas = GodotConfig.canvas;
-		// GodotEventListeners.add(canvas, 'dragover', function (ev) {
-		// 	// Prevent default behavior (which would try to open the file(s))
-		// 	ev.preventDefault();
-		// }, false);
-		// GodotEventListeners.add(canvas, 'drop', GodotInputDragDrop.handler(dropFiles));
+		if (typeof document === "undefined") {
+			return;
+		}
+		GodotEventListeners.add(canvas, 'dragover', function (ev) {
+			// Prevent default behavior (which would try to open the file(s))
+			ev.preventDefault();
+		}, false);
+		GodotEventListeners.add(canvas, 'drop', GodotInputDragDrop.handler(dropFiles));
 	},
 
 	/* Paste API */
@@ -728,12 +763,15 @@ const GodotInput = {
 	godot_js_input_paste_cb__sig: 'vi',
 	godot_js_input_paste_cb: function (callback) {
 		const func = GodotRuntime.get_func(callback);
-		// GodotEventListeners.add(window, 'paste', function (evt) {
-		// 	const text = evt.clipboardData.getData('text');
-		// 	const ptr = GodotRuntime.allocString(text);
-		// 	func(ptr);
-		// 	GodotRuntime.free(ptr);
-		// }, false);
+		if (typeof document === "undefined") {
+			return;
+		}
+		GodotEventListeners.add(window, 'paste', function (evt) {
+			const text = evt.clipboardData.getData('text');
+			const ptr = GodotRuntime.allocString(text);
+			func(ptr);
+			GodotRuntime.free(ptr);
+		}, false);
 	},
 
 	godot_js_input_vibrate_handheld__proxy: 'sync',

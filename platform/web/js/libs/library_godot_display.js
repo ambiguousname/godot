@@ -569,9 +569,7 @@ const GodotDisplay = {
 	godot_js_display_canvas_is_focused__proxy: 'sync',
 	godot_js_display_canvas_is_focused__sig: 'i',
 	godot_js_display_canvas_is_focused: function () {
-		// FIXME:
-		return false;
-		return document.activeElement === GodotConfig.canvas;
+		return typeof document !== "undefined" && document.activeElement === GodotConfig.canvas;
 	},
 
 	/*
@@ -623,16 +621,18 @@ const GodotDisplay = {
 	godot_js_display_window_title_set__proxy: 'sync',
 	godot_js_display_window_title_set__sig: 'vi',
 	godot_js_display_window_title_set: function (p_data) {
-		// FIXME:
-		return;
+		if (typeof document === "undefined") {
+			return;
+		}
 		document.title = GodotRuntime.parseString(p_data);
 	},
 
 	godot_js_display_window_icon_set__proxy: 'sync',
 	godot_js_display_window_icon_set__sig: 'vii',
 	godot_js_display_window_icon_set: function (p_ptr, p_len) {
-		// FIXME:
-		return;
+		if (typeof document === "undefined") {
+			return;
+		}
 		let link = document.getElementById('-gd-engine-icon');
 		const old_icon = GodotDisplay.window_icon;
 		if (p_ptr) {
@@ -732,8 +732,9 @@ const GodotDisplay = {
 	godot_js_display_fullscreen_cb__proxy: 'sync',
 	godot_js_display_fullscreen_cb__sig: 'vi',
 	godot_js_display_fullscreen_cb: function (callback) {
-		// FIXME:
-		return;
+		if (typeof document === "undefined") {
+			return;
+		}
 		const canvas = GodotConfig.canvas;
 		const func = GodotRuntime.get_func(callback);
 		function change_cb(evt) {
@@ -749,40 +750,46 @@ const GodotDisplay = {
 	godot_js_display_window_blur_cb__proxy: 'sync',
 	godot_js_display_window_blur_cb__sig: 'vi',
 	godot_js_display_window_blur_cb: function (callback) {
+		if (typeof document === "undefined") {
+			return;
+		}
 		const func = GodotRuntime.get_func(callback);
-		// GodotEventListeners.add(window, 'blur', function () {
-		// 	func();
-		// }, false);
+		GodotEventListeners.add(window, 'blur', function () {
+			func();
+		}, false);
 	},
 
 	godot_js_display_notification_cb__proxy: 'sync',
 	godot_js_display_notification_cb__sig: 'viiiii',
 	godot_js_display_notification_cb: function (callback, p_enter, p_exit, p_in, p_out) {
 		const canvas = GodotConfig.canvas;
-		const func = GodotRuntime.get_func(callback);
-		const notif = [p_enter, p_exit, p_in, p_out];
-		// FIXME:
-		// ['mouseover', 'mouseleave', 'focus', 'blur'].forEach(function (evt_name, idx) {
-		// 	GodotEventListeners.add(canvas, evt_name, function () {
-		// 		func(notif[idx]);
-		// 	}, true);
-		// });
+		if ("HTMLCanvasElement" in globalThis && canvas instanceof HTMLCanvasElement) {
+			const func = GodotRuntime.get_func(callback);
+			const notif = [p_enter, p_exit, p_in, p_out];
+			['mouseover', 'mouseleave', 'focus', 'blur'].forEach(function (evt_name, idx) {
+				GodotEventListeners.add(canvas, evt_name, function () {
+					func(notif[idx]);
+				}, true);
+			});
+		}
 	},
 
 	godot_js_display_setup_canvas__proxy: 'sync',
 	godot_js_display_setup_canvas__sig: 'viiii',
 	godot_js_display_setup_canvas: function (p_width, p_height, p_fullscreen, p_hidpi) {
 		const canvas = GodotConfig.canvas;
-		// FIXME: Events cannot be added.
-		// GodotEventListeners.add(canvas, 'contextmenu', function (ev) {
-		// 	ev.preventDefault();
-		// }, false);
-		// GodotEventListeners.add(canvas, 'webglcontextlost', function (ev) {
-		// 	// FIXME:
-		// 	console.error("WebGL context lost, please reload the page");
-		// 	// alert('WebGL context lost, please reload the page'); // eslint-disable-line no-alert
-		// 	ev.preventDefault();
-		// }, false);
+		if ("HTMLCanvasElement" in globalThis && canvas instanceof HTMLCanvasElement) {
+			GodotEventListeners.add(canvas, 'contextmenu', function (ev) {
+				ev.preventDefault();
+			}, false);
+
+			// Currently, only HTMLCanvasElement has `webglcontextlost` event:
+			GodotEventListeners.add(canvas, 'webglcontextlost', function (ev) {
+				console.error("WebGL context lost, please reload the page");
+				alert('WebGL context lost, please reload the page'); // eslint-disable-line no-alert
+				ev.preventDefault();
+			}, false);
+		}
 		GodotDisplayScreen.hidpi = !!p_hidpi;
 		switch (GodotConfig.canvas_resize_policy) {
 		case 0: // None

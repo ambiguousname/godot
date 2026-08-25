@@ -399,7 +399,6 @@ const GodotEventListeners = {
 		},
 
 		add: function (target, event, method, capture) {
-			console.trace()
 			if (GodotEventListeners.has(target, event, method, capture)) {
 				return;
 			}
