@@ -20,7 +20,7 @@ const Features = {
 	 * @function Engine.isFetchAvailable
 	 */
 	isFetchAvailable: function () {
-		return 'fetch' in window && 'Response' in window && 'body' in window.Response.prototype;
+		return 'fetch' in globalThis && 'Response' in globalThis && 'body' in globalThis.Response.prototype;
 	},
 
 	/**
@@ -30,7 +30,7 @@ const Features = {
 	 * @function Engine.isSecureContext
 	 */
 	isSecureContext: function () {
-		return window['isSecureContext'] === true;
+		return globalThis['isSecureContext'] === true;
 	},
 
 	/**
@@ -54,7 +54,7 @@ const Features = {
 	 * @function Engine.isSharedArrayBufferAvailable
 	 */
 	isSharedArrayBufferAvailable: function () {
-		return 'SharedArrayBuffer' in window;
+		return 'SharedArrayBuffer' in globalThis;
 	},
 
 	/**
@@ -64,7 +64,7 @@ const Features = {
 	 * @function Engine.isAudioWorkletAvailable
 	 */
 	isAudioWorkletAvailable: function () {
-		return 'AudioContext' in window && 'audioWorklet' in AudioContext.prototype;
+		return 'AudioContext' in globalThis && 'audioWorklet' in AudioContext.prototype;
 	},
 
 	/**
