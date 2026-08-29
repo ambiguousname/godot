@@ -3533,6 +3533,8 @@ void RasterizerSceneGLES3::_render_list_template(RenderListParameters *p_params,
 			SceneShaderGLES3::ShaderVariant instance_variant = shader_variant;
 
 			if (inst->instance_count > 0) {
+				Variant variants[2] = { "ERROR: FOUND USAGE OF INSTANCING, THIS IS CURRENTLY DISABLED: ", inst->mesh_instance };
+				print_error(stringify_variants(variants));
 				// Will need to use instancing to draw (either MultiMesh or Particles).
 				instance_variant = SceneShaderGLES3::ShaderVariant(1 + int(instance_variant));
 			}

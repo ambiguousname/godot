@@ -2,9 +2,7 @@
 #[modes]
 
 mode_color =
-mode_color_instancing = \n#define USE_INSTANCING
 mode_depth = #define MODE_RENDER_DEPTH
-mode_depth_instancing = #define MODE_RENDER_DEPTH \n#define USE_INSTANCING
 
 #[specializations]
 
